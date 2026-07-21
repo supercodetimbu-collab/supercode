@@ -523,6 +523,7 @@ const DEFAULT_ACTIVITY_LOGS: ActivityLog[] = [
 // DB Helper class
 export class MockDatabase {
   private static isSyncing = false;
+  private static isSavePending = false;
   private static onSyncCallback: (() => void) | null = null;
 
   static registerSyncCallback(callback: () => void) {
@@ -560,34 +561,40 @@ export class MockDatabase {
   }
 
   static async saveToServer() {
+    this.isSavePending = true;
     if (this.isSyncing) return;
-    this.isSyncing = true;
-    try {
-      const fullBackup = {
-        settings: this.getSettings(),
-        users: this.getUsers(),
-        announcements: this.getAnnouncements(),
-        news: this.getNews(),
-        devotions: this.getDevotions(),
-        events: this.getEvents(),
-        event_registrations: this.getEventRegistrations(),
-        gallery: this.getGallery(),
-        organizations: this.getOrganizations(),
-        ministries: this.getMinistries(),
-        congregations: this.getCongregations(),
-        comments: this.getComments(),
-        notifications: this.getNotifications(),
-        prayer_requests: this.getPrayerRequests(),
-      };
-      await fetch("/api/db", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(fullBackup),
-      });
-    } catch (e) {
-      console.warn("Failed to save database to server", e);
-    } finally {
-      this.isSyncing = false;
+
+    while (this.isSavePending) {
+      this.isSavePending = false;
+      this.isSyncing = true;
+      try {
+        const fullBackup = {
+          settings: this.getSettings(),
+          users: this.getUsers(),
+          announcements: this.getAnnouncements(),
+          news: this.getNews(),
+          devotions: this.getDevotions(),
+          events: this.getEvents(),
+          event_registrations: this.getEventRegistrations(),
+          gallery: this.getGallery(),
+          organizations: this.getOrganizations(),
+          ministries: this.getMinistries(),
+          congregations: this.getCongregations(),
+          comments: this.getComments(),
+          notifications: this.getNotifications(),
+          prayer_requests: this.getPrayerRequests(),
+          activity_logs: this.getLogs(),
+        };
+        await fetch("/api/db", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(fullBackup),
+        });
+      } catch (e) {
+        console.warn("Failed to save database to server", e);
+      } finally {
+        this.isSyncing = false;
+      }
     }
   }
 

@@ -2,15 +2,57 @@ import express from "express";
 import path from "path";
 import fs from "fs";
 import { createServer as createViteServer } from "vite";
+import { initializeApp } from "firebase/app";
+import { getFirestore, doc, setDoc, collection, getDocs } from "firebase/firestore";
 
 const app = express();
 const PORT = 3000;
 const DATABASE_PATH = path.join(process.cwd(), "src", "db", "church_cms_database.json");
 
+// Initialize Firebase Firestore on the server
+const CONFIG_PATH = path.join(process.cwd(), "firebase-applet-config.json");
+let firebaseApp: any = null;
+let firestoreDb: any = null;
+
+if (fs.existsSync(CONFIG_PATH)) {
+  try {
+    const config = JSON.parse(fs.readFileSync(CONFIG_PATH, "utf-8"));
+    firebaseApp = initializeApp(config);
+    // Use custom databaseId from config if provided
+    firestoreDb = getFirestore(firebaseApp, config.firestoreDatabaseId || "(default)");
+    console.log("Firebase initialized successfully on Express server with DB ID:", config.firestoreDatabaseId || "(default)");
+  } catch (e) {
+    console.error("Failed to initialize Firebase on Express server:", e);
+  }
+}
+
 app.use(express.json({ limit: "50mb" }));
 
 // Memory cache for serverless function warm containers
 let inMemoryDbCache: any = null;
+
+// Helper to save a single key-value database table to Firestore
+async function saveTableToFirestore(key: string, data: any): Promise<void> {
+  if (!firestoreDb) return;
+  try {
+    const docRef = doc(firestoreDb, "church_db", key);
+    await setDoc(docRef, { data: data });
+  } catch (e) {
+    console.error(`Failed to save table "${key}" to Firestore:`, e);
+  }
+}
+
+// Helper to save entire database to Firestore
+async function saveDatabaseToFirestore(data: any): Promise<void> {
+  if (!firestoreDb || !data) return;
+  const keys = Object.keys(data);
+  for (const key of keys) {
+    if (data[key] !== undefined) {
+      await saveTableToFirestore(key, data[key]);
+    }
+  }
+  console.log("All database tables saved to Firestore successfully.");
+}
 
 // Helper to save to Vercel KV
 async function saveDatabaseToKV(data: any) {
@@ -32,11 +74,34 @@ async function saveDatabaseToKV(data: any) {
   }
 }
 
-// Helper to load database (handles Vercel KV and local file fallback)
+// Helper to load database (handles Firestore, Vercel KV, and local file fallback)
 async function getDatabase(): Promise<any> {
   const kvUrl = process.env.KV_REST_API_URL;
   const kvToken = process.env.KV_REST_API_TOKEN;
 
+  // 1. Try Firestore database first (centralized cloud persistence)
+  if (firestoreDb) {
+    try {
+      const dbRef = collection(firestoreDb, "church_db");
+      const snapshot = await getDocs(dbRef);
+      if (!snapshot.empty) {
+        const dbData: Record<string, any> = {};
+        snapshot.forEach((doc) => {
+          dbData[doc.id] = doc.data().data;
+        });
+
+        // Verify that we retrieved a valid database (at least has settings populated)
+        if (dbData.settings) {
+          inMemoryDbCache = dbData;
+          return dbData;
+        }
+      }
+    } catch (e) {
+      console.error("Failed to fetch from Firestore on Express, falling back to other storage:", e);
+    }
+  }
+
+  // 2. Try Vercel KV
   if (kvUrl && kvToken) {
     try {
       // Query Vercel KV using REST API
@@ -73,6 +138,11 @@ async function getDatabase(): Promise<any> {
       const parsed = JSON.parse(content);
       inMemoryDbCache = parsed;
       
+      // Auto-seed Firestore if it was empty
+      if (firestoreDb && parsed) {
+        saveDatabaseToFirestore(parsed).catch(err => console.error("Auto-seeding Firestore failed:", err));
+      }
+      
       // Seed Vercel KV if it was empty
       if (kvUrl && kvToken) {
         await saveDatabaseToKV(parsed).catch(err => console.error("Auto-seeding Vercel KV failed:", err));
@@ -85,10 +155,16 @@ async function getDatabase(): Promise<any> {
   return null;
 }
 
-// Helper to save database (handles Vercel KV and local file fallback)
+// Helper to save database (handles Firestore, Vercel KV and local file fallback)
 async function saveDatabase(data: any): Promise<void> {
   inMemoryDbCache = data;
 
+  // 1. Centralized Cloud Persistence: Save to Firestore
+  if (firestoreDb) {
+    await saveDatabaseToFirestore(data).catch(err => console.error("Firestore save database failed:", err));
+  }
+
+  // 2. Secondary: Save to Vercel KV
   const kvUrl = process.env.KV_REST_API_URL;
   const kvToken = process.env.KV_REST_API_TOKEN;
 

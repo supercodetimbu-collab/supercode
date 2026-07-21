@@ -1555,16 +1555,16 @@ export default function AdminModules({
                   <div className="min-w-0 flex-1">
                     <span className="block text-[9px] font-bold text-slate-400 uppercase">Folder Google Drive Tujuan</span>
                     <a 
-                      href="https://drive.google.com/drive/folders/16VWtXcZV4LiGKUJ5mdVppKdhxjKjcPef?usp=sharing" 
+                      href="https://drive.google.com/drive/folders/1tfovDIcwAopsjXPn8Kxb1wWF9u0VXzrU?usp=sharing" 
                       target="_blank" 
                       rel="noreferrer" 
                       className="text-[10px] font-semibold text-indigo-600 hover:underline truncate block"
                     >
-                      https://drive.google.com/drive/folders/16VWtXcZV4LiGKUJ5mdVppKdhxjKjcPef?usp=sharing
+                      https://drive.google.com/drive/folders/1tfovDIcwAopsjXPn8Kxb1wWF9u0VXzrU?usp=sharing
                     </a>
                   </div>
                   <span className="text-[9px] bg-slate-200 text-slate-700 p-1 px-2 rounded-lg font-mono">
-                    ID: 16VWtXcZV...
+                    ID: 1tfovDIcw...
                   </span>
                 </div>
               </div>
