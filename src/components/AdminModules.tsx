@@ -1738,20 +1738,55 @@ export default function AdminModules({
 
               <div className="text-[11px] text-emerald-800 leading-relaxed space-y-2 bg-white/70 p-4 rounded-2xl border border-emerald-100/50">
                 <p className="font-bold uppercase tracking-wider text-[10px] text-emerald-900 mb-1">Panduan Persiapan Google Sheet:</p>
-                <ol className="list-decimal pl-4 space-y-1">
+                <ol className="list-decimal pl-4 space-y-2.5">
                   <li>Buat Google Sheet baru dan pastikan hak akses dibagikan sebagai <strong className="text-emerald-700">"Siapa saja yang memiliki link dapat melihat" (Anyone with the link can view)</strong>.</li>
-                  <li>Buat beberapa tab berikut dengan nama persis sesuai tabel database:
-                    <ul className="list-disc pl-4 mt-1 font-mono text-[9px] text-slate-600 grid grid-cols-2 gap-x-2">
-                      <li><span className="font-bold text-emerald-800">settings</span> (Konfigurasi)</li>
-                      <li><span className="font-bold text-emerald-800">users</span> (Data Pengguna)</li>
-                      <li><span className="font-bold text-emerald-800">announcements</span> (Warta/Pengumuman)</li>
-                      <li><span className="font-bold text-emerald-800">devotions</span> (Naskah Renungan)</li>
-                      <li><span className="font-bold text-emerald-800">events</span> (Kegiatan/Ibadah)</li>
-                      <li><span className="font-bold text-emerald-800">prayer_requests</span> (Doa)</li>
-                      <li><span className="font-bold text-emerald-800">gallery</span> (Dokumentasi)</li>
-                    </ul>
+                  <li>
+                    <p className="mb-1">Buat beberapa tab berikut dengan nama persis sesuai tabel database dan isi baris pertama (kolom/header) dengan nama field di bawah ini:</p>
+                    <div className="space-y-2 max-h-[220px] overflow-y-auto pr-1 mt-1.5 scrollbar-thin scrollbar-thumb-emerald-200">
+                      <div className="p-2 bg-emerald-50/50 rounded-lg border border-emerald-100/50">
+                        <span className="font-bold text-emerald-900 font-mono text-[10px]">settings</span>
+                        <p className="text-[9px] text-slate-500 font-mono mt-0.5 break-all">
+                          churchName, logoUrl, faviconUrl, bannerUrl, primaryColor, address, phone, email, website, mapsEmbedUrl, mapsLinkUrl, footerText, seoTitle, seoDescription, bankName, bankAccountNo, bankAccountName, qrisUrl, adminWelcomeText, adminSubText
+                        </p>
+                      </div>
+                      <div className="p-2 bg-emerald-50/50 rounded-lg border border-emerald-100/50">
+                        <span className="font-bold text-emerald-900 font-mono text-[10px]">users</span>
+                        <p className="text-[9px] text-slate-500 font-mono mt-0.5 break-all">
+                          id, email, name, role, photoUrl, statusBaptis, statusPernikahan, phone, address, komisi, keluarga, pelayanan, joinDate, password
+                        </p>
+                      </div>
+                      <div className="p-2 bg-emerald-50/50 rounded-lg border border-emerald-100/50">
+                        <span className="font-bold text-emerald-900 font-mono text-[10px]">announcements</span>
+                        <p className="text-[9px] text-slate-500 font-mono mt-0.5 break-all">
+                          id, title, content, priority, category, publishDate, expiryDate, isPinned, attachmentUrl, attachmentName
+                        </p>
+                      </div>
+                      <div className="p-2 bg-emerald-50/50 rounded-lg border border-emerald-100/50">
+                        <span className="font-bold text-emerald-900 font-mono text-[10px]">devotions</span>
+                        <p className="text-[9px] text-slate-500 font-mono mt-0.5 break-all">
+                          id, title, content, scripture, category, coverUrl, publishDate
+                        </p>
+                      </div>
+                      <div className="p-2 bg-emerald-50/50 rounded-lg border border-emerald-100/50">
+                        <span className="font-bold text-emerald-900 font-mono text-[10px]">events</span>
+                        <p className="text-[9px] text-slate-500 font-mono mt-0.5 break-all">
+                          id, title, content, bannerUrl, location, googleMapsUrl, dateTime, countdownDate, quota, registeredCount, status, isRegistrationOpen
+                        </p>
+                      </div>
+                      <div className="p-2 bg-emerald-50/50 rounded-lg border border-emerald-100/50">
+                        <span className="font-bold text-emerald-900 font-mono text-[10px]">prayer_requests</span>
+                        <p className="text-[9px] text-slate-500 font-mono mt-0.5 break-all">
+                          id, userId, userName, content, phone, isPrivate, status, date
+                        </p>
+                      </div>
+                      <div className="p-2 bg-emerald-50/50 rounded-lg border border-emerald-100/50">
+                        <span className="font-bold text-emerald-900 font-mono text-[10px]">gallery</span>
+                        <p className="text-[9px] text-slate-500 font-mono mt-0.5 break-all">
+                          id, title, description, imageUrl, category, date, author
+                        </p>
+                      </div>
+                    </div>
                   </li>
-                  <li>Gunakan baris pertama di setiap tab sebagai nama field/kolom (seperti: <code className="font-mono bg-slate-100 px-1 rounded text-[9px]">id</code>, <code className="font-mono bg-slate-100 px-1 rounded text-[9px]">title</code>, <code className="font-mono bg-slate-100 px-1 rounded text-[9px]">content</code>).</li>
                   <li>Salin URL penuh Google Sheet dari browser Anda, tempelkan di kolom input di bawah ini, lalu klik <strong className="text-emerald-700">Sinkronkan Sekarang</strong>.</li>
                 </ol>
               </div>

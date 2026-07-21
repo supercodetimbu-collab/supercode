@@ -306,12 +306,43 @@ app.post("/api/db/sync-sheet", async (req, res) => {
           }
 
           const parsedRows = parseCSV(csvText);
-          if (parsedRows.length <= 1) {
-            logs.push(`Tab "${table}" kosong atau hanya memiliki header.`);
+          if (parsedRows.length === 0) {
+            logs.push(`Tab "${table}" tidak mengembalikan data apa pun.`);
             return;
           }
 
           const headers = parsedRows[0].map(h => h.replace(/^"|"$/g, "").trim());
+          
+          // Define required identifying columns for each table to detect typos or default Sheet1 fallbacks
+          const requiredColumns: Record<string, string[]> = {
+            settings: ["churchName"],
+            users: ["email", "role"],
+            announcements: ["category"],
+            devotions: ["scripture"],
+            events: ["dateTime"],
+            prayer_requests: ["isPrivate"],
+            gallery: ["imageUrl"]
+          };
+
+          const required = requiredColumns[table] || [];
+          const missing = required.filter(col => !headers.includes(col));
+
+          if (missing.length > 0) {
+            // Check if the returned headers match the generic default Sheet1 ("id", "title", "content")
+            const isDefaultSheetFallback = headers.includes("id") && headers.includes("title") && headers.includes("content") && !headers.includes("churchName") && !headers.includes("role") && !headers.includes("dateTime");
+            if (isDefaultSheetFallback) {
+              logs.push(`❌ Gagal: Tab bernama "${table}" tidak ditemukan di Google Sheet Anda. Google Sheet Anda mengembalikan tab default 'Sheet1'. Silakan buat tab baru bernama persis "${table}" (huruf kecil semua).`);
+            } else {
+              logs.push(`❌ Gagal: Tab "${table}" ditemukan, tetapi tidak memiliki kolom wajib: "${missing.join(", ")}". Kolom saat ini: [${headers.join(", ")}].`);
+            }
+            return;
+          }
+
+          if (parsedRows.length <= 1) {
+            logs.push(`Tab "${table}" kosong (hanya berisi baris header).`);
+            return;
+          }
+
           const dataRows = parsedRows.slice(1);
 
           const records = dataRows.map((row, rowIndex) => {
