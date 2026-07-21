@@ -599,28 +599,38 @@ export class MockDatabase {
   }
 
   static async syncFromGoogleSheet(sheetUrl: string, tables?: string[]): Promise<{ success: boolean; logs: string[] }> {
+    const logs: string[] = ["Memulai sinkronisasi Google Sheet...", "Mengekstrak ID dari URL..."];
+    
+    // Extract Google Sheet ID from URL
+    const match = sheetUrl.match(/\/d\/([a-zA-Z0-9-_]+)/);
+    if (!match) {
+      return { success: false, logs: [...logs, "❌ URL Google Sheet tidak valid."] };
+    }
+    const sheetId = match[1];
+
+    let response: Response;
     try {
-      const response = await fetch("/api/db/sync-sheet", {
+      response = await fetch("/api/db/sync-sheet", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sheetUrl, tables }),
       });
-      
-      const contentType = response.headers.get("content-type");
-      if (!contentType || !contentType.includes("application/json")) {
-        const text = await response.text();
-        console.error("Non-JSON response received:", text);
-        return {
-          success: false,
-          logs: [
-            "Server mengembalikan respon non-JSON (HTML/Teks).",
-            `Status: ${response.status} ${response.statusText}`,
-            "Kemungkinan server sedang memuat ulang konfigurasi atau koneksi terputus.",
-            "Silakan tunggu sekitar 10-20 detik lalu coba klik Sinkronkan lagi."
-          ]
-        };
-      }
+    } catch (e: any) {
+      console.warn("Server connection failed, falling back to client-side sheet sync:", e);
+      logs.push(`⚠ Gagal menghubungi server: ${e.message || e}`);
+      logs.push("🔄 Mengaktifkan sinkronisasi langsung dari browser (Client-Side Fallback)...");
+      return await this.syncFromGoogleSheetClientSide(sheetId, tables, logs);
+    }
 
+    const contentType = response.headers.get("content-type");
+    if (!response.ok || !contentType || !contentType.includes("application/json")) {
+      console.warn(`Server returned status ${response.status} with non-JSON or error, falling back to client-side sheet sync.`);
+      logs.push(`⚠ Koneksi server mengembalikan status ${response.status}.`);
+      logs.push("🔄 Mengaktifkan sinkronisasi langsung dari browser (Client-Side Fallback)...");
+      return await this.syncFromGoogleSheetClientSide(sheetId, tables, logs);
+    }
+
+    try {
       const result = await response.json();
       if (result.success) {
         // Load the new synced database into localStorage
@@ -636,10 +646,194 @@ export class MockDatabase {
         }
         return { success: true, logs: result.logs || [] };
       } else {
-        return { success: false, logs: [result.error || "Gagal melakukan sinkronisasi"] };
+        logs.push(`⚠ Server mengembalikan error: ${result.error || "Gagal melakukan sinkronisasi"}`);
+        logs.push("🔄 Mengaktifkan sinkronisasi langsung dari browser (Client-Side Fallback)...");
+        return await this.syncFromGoogleSheetClientSide(sheetId, tables, logs);
       }
     } catch (e: any) {
-      return { success: false, logs: [e.message || "Gagal menghubungi server"] };
+      logs.push(`⚠ Error parsing response: ${e.message}`);
+      logs.push("🔄 Mengaktifkan sinkronisasi langsung dari browser (Client-Side Fallback)...");
+      return await this.syncFromGoogleSheetClientSide(sheetId, tables, logs);
+    }
+  }
+
+  static async syncFromGoogleSheetClientSide(sheetId: string, tables?: string[], initialLogs: string[] = []): Promise<{ success: boolean; logs: string[] }> {
+    const logs = [...initialLogs];
+    const targetTables = tables || [
+      "settings",
+      "users",
+      "announcements",
+      "devotions",
+      "events",
+      "prayer_requests",
+      "gallery",
+      "congregations"
+    ];
+
+    const requiredColumns: Record<string, string[]> = {
+      settings: ["churchName"],
+      users: ["email", "role"],
+      announcements: ["category"],
+      devotions: ["scripture"],
+      events: ["dateTime"],
+      prayer_requests: ["isPrivate"],
+      gallery: ["imageUrl"],
+      congregations: ["name", "phone"]
+    };
+
+    // Simple client-side CSV parser
+    const parseCSVClient = (csvText: string): string[][] => {
+      const result: string[][] = [];
+      let row: string[] = [];
+      let inQuotes = false;
+      let entry = "";
+
+      for (let i = 0; i < csvText.length; i++) {
+        const char = csvText[i];
+        const nextChar = csvText[i + 1];
+
+        if (char === '"') {
+          if (inQuotes && nextChar === '"') {
+            entry += '"';
+            i++; // skip next quote
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (char === "," && !inQuotes) {
+          row.push(entry.trim());
+          entry = "";
+        } else if ((char === "\r" || char === "\n") && !inQuotes) {
+          if (char === "\r" && nextChar === "\n") {
+            i++;
+          }
+          row.push(entry.trim());
+          result.push(row);
+          row = [];
+          entry = "";
+        } else {
+          entry += char;
+        }
+      }
+      if (entry || row.length > 0) {
+        row.push(entry.trim());
+        result.push(row);
+      }
+      return result;
+    };
+
+    try {
+      logs.push(`Mengunduh data dari Google Sheet ID: ${sheetId}...`);
+      
+      await Promise.all(
+        targetTables.map(async (table) => {
+          const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=${table}`;
+          try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+            
+            const response = await fetch(csvUrl, { signal: controller.signal });
+            clearTimeout(timeoutId);
+
+            if (!response.ok) {
+              logs.push(`✖ Tab "${table}" tidak ditemukan atau tidak dapat diakses.`);
+              return;
+            }
+
+            const csvText = await response.text();
+            
+            // Check if returned text looks like HTML (meaning sheet is private or login is requested)
+            if (csvText.trim().startsWith("<!DOCTYPE html") || csvText.includes("Sign in")) {
+              logs.push(`✖ Tab "${table}": Google Sheet harus dibagikan sebagai 'Siapa saja yang memiliki link dapat melihat' (Anyone with the link can view).`);
+              return;
+            }
+
+            const parsedRows = parseCSVClient(csvText);
+            if (parsedRows.length === 0) {
+              logs.push(`✖ Tab "${table}" tidak mengembalikan data apa pun.`);
+              return;
+            }
+
+            const headers = parsedRows[0].map(h => h.replace(/^"|"$/g, "").trim());
+            const required = requiredColumns[table] || [];
+            const missing = required.filter(col => !headers.includes(col));
+
+            if (missing.length > 0) {
+              const isDefaultSheetFallback = headers.includes("id") && headers.includes("title") && headers.includes("content") && !headers.includes("churchName") && !headers.includes("role") && !headers.includes("dateTime");
+              if (isDefaultSheetFallback) {
+                logs.push(`✖ Gagal: Tab bernama "${table}" tidak ditemukan di Google Sheet Anda. Google Sheet Anda mengembalikan tab default 'Sheet1'. Silakan buat tab baru bernama persis "${table}" (huruf kecil semua).`);
+              } else {
+                logs.push(`✖ Gagal: Tab "${table}" ditemukan, tetapi tidak memiliki kolom wajib: "${missing.join(", ")}". Kolom saat ini: [${headers.join(", ")}].`);
+              }
+              return;
+            }
+
+            if (parsedRows.length <= 1) {
+              logs.push(`ℹ Tab "${table}" kosong (hanya berisi baris header).`);
+              return;
+            }
+
+            const dataRows = parsedRows.slice(1);
+            const records = dataRows.map((row, rowIndex) => {
+              const record: Record<string, any> = {};
+              headers.forEach((header, colIndex) => {
+                if (!header) return;
+                let value: any = row[colIndex] !== undefined ? row[colIndex].replace(/^"|"$/g, "").trim() : "";
+                
+                // Try to parse JSON or boolean or numbers
+                if (value.toLowerCase() === "true") {
+                  value = true;
+                } else if (value.toLowerCase() === "false") {
+                  value = false;
+                } else if (!isNaN(Number(value)) && value !== "") {
+                  value = Number(value);
+                } else if ((value.startsWith("{") && value.endsWith("}")) || (value.startsWith("[") && value.endsWith("]"))) {
+                  try {
+                    value = JSON.parse(value);
+                  } catch (e) {
+                    // Keep as string
+                  }
+                }
+                record[header] = value;
+              });
+              
+              if (!record.id) {
+                record.id = `${table.slice(0, 3)}_${Date.now()}_${rowIndex}`;
+              }
+              return record;
+            });
+
+            if (table === "settings") {
+              if (records.length > 0) {
+                const currentSettings = this.getSettings();
+                const updatedSettings = { ...currentSettings, ...records[0] };
+                localStorage.setItem("church_cms_settings", JSON.stringify(updatedSettings));
+                logs.push(`✔ Berhasil sinkronisasi settings (1 konfigurasi).`);
+              }
+            } else {
+              localStorage.setItem(`church_cms_${table}`, JSON.stringify(records));
+              logs.push(`✔ Berhasil sinkronisasi ${table} (${records.length} baris).`);
+            }
+          } catch (error: any) {
+            logs.push(`✖ Gagal memproses tab "${table}": ${error.message}`);
+          }
+        })
+      );
+
+      // Trigger re-render and saving back to server
+      if (this.onSyncCallback) {
+        this.onSyncCallback();
+      }
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("church_db_updated"));
+      }
+      
+      // Try backing up to Express server in background
+      this.saveToServer().catch(e => console.warn("Background backup to server failed:", e));
+
+      logs.push("✔ Sinkronisasi lokal via browser selesai!");
+      return { success: true, logs };
+    } catch (err: any) {
+      return { success: false, logs: [...logs, `✖ Kesalahan kritis client-side: ${err.message || err}`] };
     }
   }
 
