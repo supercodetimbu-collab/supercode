@@ -3,16 +3,16 @@ import {createRoot} from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
 
-// Clear and unregister any active Service Workers to avoid aggressive caching and blank screens on GitHub Pages
+// Register PWA Service Worker to support offline caching and automatic Android/iOS installation prompts
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.getRegistrations().then((registrations) => {
-    for (const registration of registrations) {
-      registration.unregister().then(() => {
-        console.log('[PWA] Service Worker unregistered to prevent cache/blank screen issues.');
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then((registration) => {
+        console.log('[PWA] Service Worker registered successfully with scope:', registration.scope);
+      })
+      .catch((error) => {
+        console.error('[PWA] Service Worker registration failed:', error);
       });
-    }
-  }).catch((err) => {
-    console.error('[PWA] Failed to unregister service worker:', err);
   });
 }
 

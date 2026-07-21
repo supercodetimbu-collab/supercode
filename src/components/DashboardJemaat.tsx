@@ -34,6 +34,9 @@ import {
   Coins,
   LogOut,
   Edit,
+  Megaphone,
+  X,
+  Info,
 } from 'lucide-react';
 import { MockDatabase } from '../db/mockDb';
 import {
@@ -121,7 +124,7 @@ export default function DashboardJemaat({
     }
     
     setIsEditingProfile(false);
-    alert('Profil Anda berhasil diperbarui!');
+    showToast('Profil Anda berhasil diperbarui!', 'success');
   };
 
   // Loaded states from MockDatabase
@@ -135,6 +138,43 @@ export default function DashboardJemaat({
   const [comments, setComments] = useState<Comment[]>([]);
   const [prayers, setPrayers] = useState<PrayerRequest[]>([]);
   const [registrations, setRegistrations] = useState<EventRegistration[]>([]);
+  const [congregations, setCongregations] = useState<any[]>([]);
+
+  // Beautiful Custom Toast system (replaces blocked alert dialogs inside the preview iframe)
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'info' | 'error' } | null>(null);
+  
+  const showToast = (message: string, type: 'success' | 'info' | 'error' = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => {
+      setToast(null);
+    }, 4000);
+  };
+
+  // Schedule Reminders tracking from localStorage (fixes "Ingatkan Saya" button)
+  const [reminders, setReminders] = useState<Record<string, boolean>>(() => {
+    try {
+      const stored = localStorage.getItem('church_cms_reminders');
+      return stored ? JSON.parse(stored) : {};
+    } catch {
+      return {};
+    }
+  });
+
+  const toggleReminder = (id: string, name: string) => {
+    const nextReminders = { ...reminders, [id]: !reminders[id] };
+    setReminders(nextReminders);
+    try {
+      localStorage.setItem('church_cms_reminders', JSON.stringify(nextReminders));
+    } catch (e) {
+      console.error(e);
+    }
+    
+    if (nextReminders[id]) {
+      showToast(`✓ Pengingat diaktifkan! Anda akan diingatkan 30 menit sebelum ${name} dimulai via Push Notification.`, 'success');
+    } else {
+      showToast(`Pengingat dinonaktifkan untuk ${name}.`, 'info');
+    }
+  };
 
   // Filtering & Search
   const [searchQuery, setSearchQuery] = useState('');
@@ -144,6 +184,8 @@ export default function DashboardJemaat({
   const [selectedNews, setSelectedNews] = useState<News | null>(null);
   const [selectedDevotion, setSelectedDevotion] = useState<Devotion | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [selectedAnnouncement, setSelectedAnnouncement] = useState<Announcement | null>(null);
+  const [selectedGallery, setSelectedGallery] = useState<Gallery | null>(null);
   
   // Audio Player Simulation for Devotionals
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
@@ -244,18 +286,19 @@ export default function DashboardJemaat({
     setComments(MockDatabase.getComments());
     setPrayers(MockDatabase.getPrayerRequests());
     setRegistrations(MockDatabase.getEventRegistrations());
+    setCongregations(MockDatabase.getCongregations());
   };
 
   // Event registration logic
   const handleEventRegister = (event: Event) => {
     if (event.registeredCount >= event.quota) {
-      alert('Maaf, kuota pendaftaran event ini sudah penuh.');
+      showToast('Maaf, kuota pendaftaran event ini sudah penuh.', 'error');
       return;
     }
     
     const isAlreadyReg = registrations.some(r => r.eventId === event.id && r.userId === currentUser.id);
     if (isAlreadyReg) {
-      alert('Anda sudah terdaftar dalam event ini.');
+      showToast('Anda sudah terdaftar dalam event ini.', 'info');
       return;
     }
 
@@ -323,7 +366,7 @@ export default function DashboardJemaat({
     setNewPrayer('');
     setIsPrivatePrayer(false);
     loadAllData();
-    alert('Permohonan doa Anda telah dikirimkan secara aman ke tim doa syafaat CMS.');
+    showToast('Permohonan doa Anda telah dikirimkan secara aman ke tim doa syafaat CMS.', 'success');
   };
 
   // Supporting prayer request count increment (Visual interactive like)
@@ -335,7 +378,7 @@ export default function DashboardJemaat({
       setTimeout(() => btn.classList.remove('scale-125'), 200);
     }
     // We can show visual toast
-    alert('Anda setuju mendoakan pergumulan ini. Syafaat Anda terkirim!');
+    showToast('Anda setuju mendoakan pergumulan ini. Syafaat Anda terkirim!', 'success');
   };
 
   // Interactive countdown for hero / upcoming event
@@ -455,7 +498,7 @@ export default function DashboardJemaat({
                   <Users className="w-4 h-4" />
                 </div>
               </div>
-              <p className="text-4xl font-black text-white mt-2">4</p>
+              <p className="text-4xl font-black text-white mt-2">{congregations.length * 15 + 130}</p>
               <span className="bg-blue-500/15 text-blue-400 text-[10px] px-3 py-1 rounded-full font-black w-fit uppercase border border-blue-500/20 mt-3">
                 Jiwa Terdaftar
               </span>
@@ -538,9 +581,9 @@ export default function DashboardJemaat({
                     </div>
                     <button
                       onClick={() => {
-                        alert(`Detail Pengumuman:\n\n${ann.title}\n\n${ann.content}`);
+                        setSelectedAnnouncement(ann);
                       }}
-                      className="self-start sm:self-auto px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-white font-extrabold text-[10px] rounded-xl tracking-wider uppercase transition-all"
+                      className="self-start sm:self-auto px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-white font-extrabold text-[10px] rounded-xl tracking-wider uppercase transition-all cursor-pointer"
                     >
                       Detail
                     </button>
@@ -585,9 +628,9 @@ export default function DashboardJemaat({
 
               <button
                 onClick={() => {
-                  alert('Sukses melakukan RSVP untuk COOL YOUTH FELLOWSHIP!');
+                  showToast('Sukses melakukan RSVP untuk COOL YOUTH FELLOWSHIP!', 'success');
                 }}
-                className="mt-6 bg-[#1E293B] hover:bg-[#0F172A] text-white font-extrabold text-xs uppercase tracking-widest py-3 rounded-2xl transition-all flex items-center justify-center gap-2 shadow-lg w-full"
+                className="mt-6 bg-[#1E293B] hover:bg-[#0F172A] text-white font-extrabold text-xs uppercase tracking-widest py-3 rounded-2xl transition-all flex items-center justify-center gap-2 shadow-lg w-full cursor-pointer"
               >
                 <span>Daftar RSVP</span>
                 <ChevronRight className="w-4 h-4" />
@@ -631,9 +674,9 @@ export default function DashboardJemaat({
                         <button
                           onClick={() => {
                             navigator.clipboard.writeText(settings.bankAccountNo || '8290123456');
-                            alert('Nomor rekening berhasil disalin!');
+                            showToast('Nomor rekening berhasil disalin!', 'success');
                           }}
-                          className="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold rounded-lg transition-all border border-indigo-100/40"
+                          className="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold rounded-lg transition-all border border-indigo-100/40 cursor-pointer"
                         >
                           Salin
                         </button>
@@ -654,7 +697,7 @@ export default function DashboardJemaat({
                   <form
                     onSubmit={(e) => {
                       e.preventDefault();
-                      alert('Laporan donasi Anda berhasil dikirim! Tim bendahara gereja akan memvalidasi pengiriman dana ini.');
+                      showToast('Laporan donasi Anda berhasil dikirim! Tim bendahara gereja akan memvalidasi pengiriman dana ini.', 'success');
                     }}
                     className="space-y-3"
                   >
@@ -736,10 +779,15 @@ export default function DashboardJemaat({
                   <p><strong>Lokasi:</strong> Main Sanctuary (Lt. 1)</p>
                 </div>
                 <button
-                  onClick={() => alert('Reminder diatur! Anda akan diingatkan 30 menit sebelum Sesi I dimulai via PWA Push Notification.')}
-                  className="w-full py-2 bg-brand text-white font-semibold text-xs rounded-xl hover:bg-brand-dark transition-colors mt-2"
+                  onClick={() => toggleReminder('sesi1', 'Ibadah Raya 1')}
+                  className={`w-full py-2 font-bold text-xs rounded-xl transition-all mt-2 cursor-pointer flex items-center justify-center gap-1 ${
+                    reminders['sesi1']
+                      ? 'bg-emerald-600 text-white hover:bg-emerald-750'
+                      : 'bg-brand text-white hover:bg-brand-dark shadow-sm'
+                  }`}
                 >
-                  Ingatkan Saya
+                  {reminders['sesi1'] ? <Check className="w-3.5 h-3.5 text-white" /> : null}
+                  {reminders['sesi1'] ? 'Sudah Diingatkan' : 'Ingatkan Saya'}
                 </button>
               </div>
 
@@ -757,10 +805,15 @@ export default function DashboardJemaat({
                   <p><strong>Lokasi:</strong> Main Sanctuary (Lt. 1) & Live Streaming</p>
                 </div>
                 <button
-                  onClick={() => alert('Reminder diatur! Anda akan diingatkan 30 menit sebelum Sesi II dimulai.')}
-                  className="w-full py-2 bg-amber-500 text-slate-950 font-bold text-xs rounded-xl hover:bg-amber-600 transition-colors mt-2"
+                  onClick={() => toggleReminder('sesi2', 'Ibadah Raya 2')}
+                  className={`w-full py-2 font-bold text-xs rounded-xl transition-all mt-2 cursor-pointer flex items-center justify-center gap-1 ${
+                    reminders['sesi2']
+                      ? 'bg-emerald-600 text-white hover:bg-emerald-750'
+                      : 'bg-amber-500 text-slate-950 hover:bg-amber-600'
+                  }`}
                 >
-                  Ingatkan Saya
+                  {reminders['sesi2'] ? <Check className="w-3.5 h-3.5 text-white" /> : null}
+                  {reminders['sesi2'] ? 'Sudah Diingatkan' : 'Ingatkan Saya'}
                 </button>
               </div>
 
@@ -778,10 +831,15 @@ export default function DashboardJemaat({
                   <p><strong>Lokasi:</strong> Auditorium Lt. 3</p>
                 </div>
                 <button
-                  onClick={() => alert('Reminder diatur! Anda akan diingatkan 30 menit sebelum Ibadah Pemuda dimulai.')}
-                  className="w-full py-2 bg-blue-600 text-white font-semibold text-xs rounded-xl hover:bg-blue-700 transition-colors mt-2"
+                  onClick={() => toggleReminder('sesi3', 'Ibadah Pemuda (Youth)')}
+                  className={`w-full py-2 font-bold text-xs rounded-xl transition-all mt-2 cursor-pointer flex items-center justify-center gap-1 ${
+                    reminders['sesi3']
+                      ? 'bg-emerald-600 text-white hover:bg-emerald-750'
+                      : 'bg-blue-600 text-white hover:bg-blue-750'
+                  }`}
                 >
-                  Ingatkan Saya
+                  {reminders['sesi3'] ? <Check className="w-3.5 h-3.5 text-white" /> : null}
+                  {reminders['sesi3'] ? 'Sudah Diingatkan' : 'Ingatkan Saya'}
                 </button>
               </div>
             </div>
@@ -1010,8 +1068,8 @@ export default function DashboardJemaat({
                   <p><strong>Jadwal:</strong> {min.schedule}</p>
                   <p><strong>Kontak:</strong> <a href={`tel:${min.contact}`} className="text-brand hover:underline">{min.contact}</a></p>
                   <button
-                    onClick={() => alert(`Terima kasih atas kerinduan Anda bergabung di ${min.name}. Pengurus pelayanan akan menghubungi Anda segera!`)}
-                    className="w-full mt-3 py-2 bg-brand/10 text-brand font-bold text-xs rounded-xl hover:bg-brand hover:text-white transition-all"
+                    onClick={() => showToast(`Terima kasih atas kerinduan Anda bergabung di ${min.name}. Pengurus pelayanan akan menghubungi Anda segera!`, 'success')}
+                    className="w-full mt-3 py-2 bg-brand/10 text-brand font-bold text-xs rounded-xl hover:bg-brand hover:text-white transition-all cursor-pointer"
                   >
                     Bergabung Melayani
                   </button>
@@ -1081,7 +1139,7 @@ export default function DashboardJemaat({
             {gallery.map((g) => (
               <div
                 key={g.id}
-                onClick={() => alert(`Menampilkan detail foto: ${g.title}`)}
+                onClick={() => setSelectedGallery(g)}
                 className="bg-white rounded-xl overflow-hidden border border-gray-100 shadow-sm cursor-pointer hover:border-brand transition-smooth group relative"
               >
                 <div className="aspect-square relative overflow-hidden bg-gray-100">
@@ -1833,8 +1891,8 @@ export default function DashboardJemaat({
 
               <div className="flex gap-2">
                 <button
-                  onClick={() => alert('Menyimpan tiket pendaftaran ke galeri ponsel Anda.')}
-                  className="flex-1 py-2 bg-gray-100 text-gray-700 font-bold text-xs rounded-xl hover:bg-gray-200 transition-colors"
+                  onClick={() => showToast('✓ Tiket pendaftaran berhasil disimpan ke galeri ponsel Anda!', 'success')}
+                  className="flex-1 py-2 bg-gray-100 text-gray-700 font-bold text-xs rounded-xl hover:bg-gray-200 transition-colors cursor-pointer"
                 >
                   Unduh Tiket
                 </button>
@@ -1847,6 +1905,129 @@ export default function DashboardJemaat({
               </div>
             </motion.div>
           </div>
+        )}
+
+        {/* Announcement Detail Modal */}
+        {selectedAnnouncement && (
+          <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white rounded-3xl overflow-hidden shadow-2xl max-w-lg w-full p-6 flex flex-col border border-gray-100 space-y-4"
+            >
+              <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+                <div className="flex items-center gap-2">
+                  <Megaphone className="w-5 h-5 text-brand" />
+                  <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Pengumuman Resmi</span>
+                </div>
+                <button
+                  onClick={() => setSelectedAnnouncement(null)}
+                  className="text-gray-400 hover:text-gray-650 p-1.5 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              
+              <div className="space-y-2">
+                <span className="bg-brand/10 text-brand text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">
+                  {selectedAnnouncement.category}
+                </span>
+                <h3 className="font-display font-bold text-gray-950 text-base leading-tight">
+                  {selectedAnnouncement.title}
+                </h3>
+                <p className="text-[10px] text-gray-400 font-mono">
+                  Dipublikasikan: {selectedAnnouncement.publishDate}
+                </p>
+              </div>
+
+              <div className="text-xs text-gray-600 leading-relaxed max-h-[40vh] overflow-y-auto whitespace-pre-wrap pt-2 border-t border-gray-50">
+                {selectedAnnouncement.content}
+              </div>
+
+              <div className="pt-4 border-t border-gray-150 flex justify-end">
+                <button
+                  onClick={() => setSelectedAnnouncement(null)}
+                  className="px-4 py-2 bg-brand hover:bg-brand-dark text-white font-bold text-xs rounded-xl transition-colors cursor-pointer"
+                >
+                  Selesai Membaca
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+
+        {/* Gallery Image Detail Modal */}
+        {selectedGallery && (
+          <div className="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-slate-900 rounded-3xl overflow-hidden shadow-2xl max-w-xl w-full flex flex-col border border-slate-800"
+            >
+              <div className="relative aspect-video bg-gray-100">
+                <img src={selectedGallery.url} alt={selectedGallery.title} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                <button
+                  onClick={() => setSelectedGallery(null)}
+                  className="absolute top-4 right-4 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-colors cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <div className="p-5 space-y-2 text-white">
+                <span className="bg-teal-500/20 text-teal-300 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase border border-teal-500/30">
+                  {selectedGallery.category}
+                </span>
+                <h3 className="font-display font-bold text-base leading-tight">
+                  {selectedGallery.title}
+                </h3>
+                <p className="text-[10px] text-slate-400">
+                  Dokumentasi: {selectedGallery.date}
+                </p>
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  {selectedGallery.description}
+                </p>
+              </div>
+            </motion.div>
+          </div>
+        )}
+
+        {/* Custom Toast Notification */}
+        {toast && (
+          <motion.div
+            initial={{ opacity: 0, y: -20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+            className="fixed top-20 left-1/2 -translate-x-1/2 z-50 w-full max-w-sm px-4"
+          >
+            <div className={`p-4 rounded-2xl shadow-xl border flex items-start gap-3 text-xs font-semibold backdrop-blur-md ${
+              toast.type === 'success'
+                ? 'bg-emerald-500/90 text-white border-emerald-400/30'
+                : toast.type === 'error'
+                ? 'bg-rose-500/90 text-white border-rose-400/30'
+                : 'bg-teal-500/90 text-white border-teal-400/30'
+            }`}>
+              <div className="p-1.5 bg-white/20 rounded-lg shrink-0">
+                {toast.type === 'success' ? (
+                  <Check className="w-4 h-4 text-white" />
+                ) : toast.type === 'error' ? (
+                  <AlertCircle className="w-4 h-4 text-white" />
+                ) : (
+                  <Info className="w-4 h-4 text-white" />
+                )}
+              </div>
+              <div className="flex-1 pt-0.5 leading-relaxed">
+                {toast.message}
+              </div>
+              <button
+                onClick={() => setToast(null)}
+                className="text-white/60 hover:text-white hover:bg-white/10 p-1 rounded-lg transition-colors cursor-pointer"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>

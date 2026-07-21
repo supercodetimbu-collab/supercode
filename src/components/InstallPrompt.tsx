@@ -32,7 +32,24 @@ export default function InstallPrompt() {
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e);
-      // Auto-show prompt after 3 seconds on load unless dismissed
+      
+      // Auto-trigger native install prompt on first click/touchstart for Android
+      if (isAndroid) {
+        const triggerNativePrompt = () => {
+          (e as any).prompt();
+          (e as any).userChoice.then((choiceResult: any) => {
+            console.log('[PWA] Auto-triggered native prompt outcome:', choiceResult.outcome);
+            setDeferredPrompt(null);
+            setShowPrompt(false);
+          });
+          window.removeEventListener('click', triggerNativePrompt);
+          window.removeEventListener('touchstart', triggerNativePrompt);
+        };
+        window.addEventListener('click', triggerNativePrompt);
+        window.addEventListener('touchstart', triggerNativePrompt);
+      }
+
+      // Auto-show prompt banner after 3 seconds on load unless dismissed
       const dismissed = sessionStorage.getItem('install_prompt_dismissed') === 'true';
       if (!dismissed) {
         setTimeout(() => {
