@@ -1,0 +1,452 @@
+{
+  "settings": {
+    "churchName": "GBI ROCK JUANDA",
+    "logoUrl": "https://images.unsplash.com/photo-1548625361-155de0cbb10a?w=120&auto=format&fit=crop&q=80",
+    "faviconUrl": "https://images.unsplash.com/photo-1548625361-155de0cbb10a?w=32&auto=format&fit=crop&q=80",
+    "bannerUrl": "https://images.unsplash.com/photo-1438032005730-c779502df39b?w=1200&auto=format&fit=crop&q=80",
+    "primaryColor": "#1e3a8a",
+    "address": "Jl. Raya Juanda No. 1, Sidoarjo, Jawa Timur 61253",
+    "phone": "031-8681234 / +62 811-3333-5555",
+    "email": "info@gbirockjuanda.org",
+    "website": "https://www.gbirockjuanda.org",
+    "socialMedia": {
+      "facebook": "https://facebook.com/gbirockjuanda",
+      "instagram": "https://instagram.com/gbirockjuanda",
+      "youtube": "https://youtube.com/gbirockjuanda",
+      "tiktok": "https://tiktok.com/@gbirockjuanda"
+    },
+    "mapsEmbedUrl": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3956.82200832049!2d112.780123!3d-7.378123!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zN8KwMjInNDEuMiJTIDExMsKwNDYnNDguNCJF!5e0!3m2!1sid!2sid!4v1710920000000!5m2!1sid!2sid",
+    "mapsLinkUrl": "https://maps.app.goo.gl/gbirockjuanda",
+    "footerText": "© 2026 GBI Rock Juanda. Hak Cipta Dilindungi.",
+    "seoTitle": "GBI ROCK JUANDA - Portal Jemaat & Pelayanan",
+    "seoDescription": "Sistem Informasi Manajemen dan Pelayanan GBI Rock Juanda. Membangun jemaat yang bertumbuh, melayani dengan kasih.",
+    "maxUploadSizeMb": 10,
+    "bankName": "BCA (Bank Central Asia)",
+    "bankAccountNo": "8290123456",
+    "bankAccountName": "GBI ROCK JUANDA",
+    "qrisUrl": "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=GBI_ROCK_JUANDA_OFFERING",
+    "adminWelcomeText": "Selamat Datang, Pnt. Budi Santoso!",
+    "adminSubText": "Sistem Informasi Manajemen dan Pelayanan CMS. Kelola berita, kustomisasi donasi, moderation komentar, and kelola jajaran organisasi secara instan."
+  },
+  "users": [
+    {
+      "id": "usr_superadmin",
+      "email": "superadmin@church.com",
+      "name": "Pnt. Budi Santoso",
+      "role": "SUPER_ADMIN",
+      "photoUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+      "statusBaptis": "Sudah",
+      "statusPernikahan": "Menikah",
+      "phone": "081234567801",
+      "address": "Sektor 9, Bintaro Jaya, Tangerang Selatan",
+      "komisi": "Dewasa",
+      "keluarga": "Kepala Keluarga (Istri: Maria, Anak: Samuel)",
+      "pelayanan": "Majelis Jemaat",
+      "joinDate": "2015-04-12"
+    },
+    {
+      "id": "usr_admin",
+      "email": "admin@church.com",
+      "name": "Siti Rahmawati",
+      "role": "ADMIN",
+      "photoUrl": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80",
+      "statusBaptis": "Sudah",
+      "statusPernikahan": "Menikah",
+      "phone": "081234567802",
+      "address": "Kembangan, Jakarta Barat",
+      "komisi": "Wanita",
+      "keluarga": "Istri (Suami: Yusuf)",
+      "pelayanan": "Multimedia & Sekretariat",
+      "joinDate": "2018-08-19"
+    },
+    {
+      "id": "usr_jemaat",
+      "email": "jemaat@church.com",
+      "name": "Andi Wijaya",
+      "role": "JEMAAT",
+      "photoUrl": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
+      "statusBaptis": "Sudah",
+      "statusPernikahan": "Belum Menikah",
+      "phone": "081234567803",
+      "address": "Taman Ratu, Jakarta Barat",
+      "komisi": "Pemuda",
+      "keluarga": "Anak (Orang tua: Setiawan Wijaya)",
+      "pelayanan": "Pemain Musik (Keyboard)",
+      "joinDate": "2020-01-05"
+    }
+  ],
+  "announcements": [
+    {
+      "id": "ann_1",
+      "title": "Ibadah Raya Khusus Paskah 2026",
+      "content": "Diberitahukan kepada seluruh jemaat bahwa Ibadah Raya Paskah akan dilaksanakan pada hari Minggu, 5 April 2026. Ibadah akan dibagi menjadi 3 sesi: Sesi 1 (Subuh) jam 05.00 WIB, Sesi 2 jam 08.00 WIB, dan Sesi 3 jam 11.00 WIB. Mohon jemaat hadir 15 menit sebelum ibadah dimulai untuk ketertiban bersama.",
+      "priority": "high",
+      "category": "Ibadah Raya",
+      "publishDate": "2026-07-15",
+      "expiryDate": "2026-08-15",
+      "isPinned": true,
+      "attachmentUrl": "#",
+      "attachmentName": "Tata_Ibadah_Paskah_2026.pdf"
+    },
+    {
+      "id": "ann_2",
+      "title": "Aksi Sosial Donor Darah & Pengobatan Gratis",
+      "content": "Komisi Pelayanan Sosial CMS bekerja sama dengan Palang Merah Indonesia (PMI) akan mengadakan aksi sosial Donor Darah dan Pengobatan Gratis untuk warga sekitar gereja. Acara diadakan pada Sabtu, 25 Juli 2026 mulai pukul 08.00 - 13.00 WIB di Aula Serbaguna CMS. Mari berpartisipasi!",
+      "priority": "medium",
+      "category": "Kegiatan Sosial",
+      "publishDate": "2026-07-18",
+      "expiryDate": "2026-07-26",
+      "isPinned": false
+    },
+    {
+      "id": "ann_3",
+      "title": "Kelas Katekisasi Sidasi / Baptis Dewasa Baru",
+      "content": "Pendaftaran kelas Katekisasi persiapan baptis dewasa dan sidasi sidi tahun ajaran 2026/2027 telah dibuka. Kelas perdana akan dimulai pada Sabtu, 1 Agustus 2026 pukul 16.00 WIB di Ruang Konseling. Formulir pendaftaran dapat diambil di sekretariat gereja atau melalui pengisian formulir digital di dashboard jemaat.",
+      "priority": "medium",
+      "category": "Pendidikan",
+      "publishDate": "2026-07-10",
+      "expiryDate": "2026-08-02",
+      "isPinned": false,
+      "attachmentName": "Formulir_Katekisasi.docx",
+      "attachmentUrl": "#"
+    }
+  ],
+  "news": [
+    {
+      "id": "news_1",
+      "title": "Sukses Terlaksana: KKR Pemuda-Remaja CMS 2026 Menarik Ratusan Peserta",
+      "content": "Kebaktian Kebangunan Rohani (KKR) Tahunan Pemuda dan Remaja CMS sukses diselenggarakan pada hari Sabtu kemarin. Bertempat di Auditorium CMS, KKR bertema \"Shine Your Light\" ini dihadiri oleh lebih dari 350 anak muda dari berbagai wilayah. Pembicara Pdt. Michael Yosef menyampaikan pesan yang membakar semangat pemuda untuk tetap berpegang teguh pada firman Tuhan di era digital yang penuh tantangan ini. Acara juga dimeriahkan oleh penampilan Youth Choir dan drama musikal spektakuler.",
+      "category": "Pemuda",
+      "coverUrl": "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&auto=format&fit=crop&q=80",
+      "author": "Siti Rahmawati",
+      "publishDate": "2026-07-19",
+      "status": "published",
+      "likes": 124,
+      "views": 489,
+      "commentsCount": 3
+    },
+    {
+      "id": "news_2",
+      "title": "CMS Menyalurkan Bantuan Sosial untuk Korban Kebakaran Tambora",
+      "content": "CMS (SYSTEM MANAGEMENT CHURCH) melalui Komisi Diakonia dan Pelayanan Masyarakat bergerak cepat menyalurkan bantuan logistik darurat kepada korban bencana kebakaran di pemukiman padat penduduk Tambora, Jakarta Barat. Bantuan berupa bahan makanan pokok, pakaian layak pakai, selimut, air mineral, serta obat-obatan diserahkan langsung oleh perwakilan Majelis Jemaat kepada posko darurat setempat. Kami mengucapkan terima kasih yang sebesar-besarnya atas donasi materiil dan doa dari jemaat sekalian.",
+      "category": "Pelayanan Sosial",
+      "coverUrl": "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=800&auto=format&fit=crop&q=80",
+      "author": "Pnt. Budi Santoso",
+      "publishDate": "2026-07-14",
+      "status": "published",
+      "likes": 89,
+      "views": 290,
+      "commentsCount": 1
+    },
+    {
+      "id": "news_3",
+      "title": "Persiapan Pelayanan Natal dan Tata Tertib Panitia Baru",
+      "content": "Draf rencana kepanitiaan Perayaan Natal 2026 dan Tahun Baru 2027 telah disusun. Dokumen ini membahas struktur panitia, tema perayaan, serta estimasi anggaran per divisi. Pertemuan perdana seluruh calon panitia dijadwalkan pada pertengahan Agustus untuk mematangkan konsep acara.",
+      "category": "Internal",
+      "coverUrl": "https://images.unsplash.com/photo-1544982503-9f984c14501a?w=800&auto=format&fit=crop&q=80",
+      "author": "Siti Rahmawati",
+      "publishDate": "2026-07-20",
+      "status": "draft",
+      "likes": 0,
+      "views": 5,
+      "commentsCount": 0
+    }
+  ],
+  "devotions": [
+    {
+      "id": "dev_1",
+      "title": "Berjalan dalam Terang",
+      "content": "Dalam kehidupan sehari-hari, kita seringkali dihadapkan pada pilihan-pilihan sulit. Firman Tuhan hari ini mengingatkan kita untuk selalu mengarahkan langkah kita pada kebenaran Allah. \"Tetapi jika kita hidup di dalam terang sama seperti Dia ada di dalam terang, maka kita beroleh persekutuan seorang dengan yang lain...\" Berjalan dalam terang berarti hidup dengan kejujuran, integritas, dan tanpa ada hal tersembunyi yang mendatangkan dosa. Ketika kita melakukan kebenaran, damai sejahtera surgawi akan senantiasa memenuhi hati kita.",
+      "scripture": "1 Yohanes 1:7",
+      "category": "Iman & Integritas",
+      "coverUrl": "https://images.unsplash.com/photo-1509021436665-8f07dbf5bf1d?w=800&auto=format&fit=crop&q=80",
+      "audioUrl": "#",
+      "pdfUrl": "#",
+      "publishDate": "2026-07-20"
+    },
+    {
+      "id": "dev_2",
+      "title": "Kekuatan di Tengah Kelemahan",
+      "content": "Manusia cenderung ingin terlihat kuat, sukses, dan mandiri. Namun, di hadapan Tuhan, pengakuan akan keterbatasan kita justru membuka jalan bagi kuasa-Nya yang luar biasa bekerja. Paulus mengalaminya sendiri saat dia memohon agar duri dalam dagingnya diangkat. Jawaban Tuhan sangat indah: \"Cukuplah kasih karunia-Ku bagimu, sebab di dalam kelemahanlah kuasa-Ku menjadi sempurna.\" Ketika kita merasa lemah, lelah, dan tak berdaya, serahkanlah segalanya dalam doa. Kuasa Roh Kudus akan memampukan kita melakukan hal-hal besar melampaui logika kita.",
+      "scripture": "2 Korintus 12:9",
+      "category": "Penghiburan",
+      "coverUrl": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&auto=format&fit=crop&q=80",
+      "publishDate": "2026-07-19"
+    }
+  ],
+  "events": [
+    {
+      "id": "evt_1",
+      "title": "Seminar Hubungan Keluarga & Pasangan Bahagia 2026",
+      "content": "Membangun keluarga Kristen yang harmonis, tangguh, dan berlandaskan kasih Kristus di tengah gempuran tren modern. Seminar ini menghadirkan pembicara pakar konseling keluarga kristen, Dr. Irwan Handoko & Dra. Maria Handoko. Sesi interaktif meliputi komunikasi suami-istri, mendidik anak di era digital, dan penyelesaian konflik keluarga dengan bijaksana.",
+      "bannerUrl": "https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=800&auto=format&fit=crop&q=80",
+      "location": "Aula Lt. 3 Gedung CMS Jakarta",
+      "googleMapsUrl": "https://maps.google.com",
+      "dateTime": "2026-08-15T09:00",
+      "countdownDate": "2026-08-15T09:00:00",
+      "quota": 150,
+      "registeredCount": 42,
+      "status": "upcoming",
+      "isRegistrationOpen": true
+    },
+    {
+      "id": "evt_2",
+      "title": "Kebaktian KKR Pujian & Penyembahan (Worship Night)",
+      "content": "Malam penyerahan diri dan penyembahan bersama seluruh jemaat. Bersiap mengalami hadirat Tuhan yang memulihkan melalui nyanyian pujian, doa syafaat bersama, serta firman yang meneguhkan. Acara ini terbuka untuk umum.",
+      "bannerUrl": "https://images.unsplash.com/photo-1465847899084-d164df4dedc6?w=800&auto=format&fit=crop&q=80",
+      "location": "Main Sanctuary CMS Jakarta",
+      "googleMapsUrl": "https://maps.google.com",
+      "dateTime": "2026-07-28T19:00",
+      "countdownDate": "2026-07-28T19:00:00",
+      "quota": 500,
+      "registeredCount": 182,
+      "status": "upcoming",
+      "isRegistrationOpen": true
+    }
+  ],
+  "event_registrations": [
+    {
+      "id": "reg_1",
+      "eventId": "evt_1",
+      "eventTitle": "Seminar Hubungan Keluarga & Pasangan Bahagia 2026",
+      "userId": "usr_jemaat",
+      "userName": "Andi Wijaya",
+      "userEmail": "jemaat@church.com",
+      "phone": "081234567803",
+      "registerDate": "2026-07-19T10:14:22",
+      "status": "approved",
+      "qrCodeUrl": "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=REG-EVT1-ANDIWIJAYA",
+      "attended": false
+    }
+  ],
+  "gallery": [
+    {
+      "id": "gal_1",
+      "title": "Keceriaan Kebaktian Sekolah Minggu (SM) CMS",
+      "type": "image",
+      "url": "https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?w=600&auto=format&fit=crop&q=80",
+      "category": "Sekolah Minggu",
+      "uploadDate": "2026-07-10"
+    },
+    {
+      "id": "gal_2",
+      "title": "Pelayanan Paduan Suara Dewasa CMS di Ibadah Raya",
+      "type": "image",
+      "url": "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600&auto=format&fit=crop&q=80",
+      "category": "Ibadah Raya",
+      "uploadDate": "2026-07-12"
+    },
+    {
+      "id": "gal_3",
+      "title": "Video Dokumentasi Retreat Pemuda CMS 2026",
+      "type": "video",
+      "url": "https://images.unsplash.com/photo-1465847899084-d164df4dedc6?w=600&auto=format&fit=crop&q=80",
+      "category": "Pemuda",
+      "uploadDate": "2026-07-15"
+    },
+    {
+      "id": "gal_4",
+      "title": "Aksi Bersih-bersih Lingkungan Sekitar Gereja",
+      "type": "image",
+      "url": "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=600&auto=format&fit=crop&q=80",
+      "category": "Sosial",
+      "uploadDate": "2026-07-16"
+    }
+  ],
+  "organizations": [
+    {
+      "id": "org_1",
+      "name": "Pdt. Dr. Samuel Wijaya",
+      "roleName": "Pendeta Utama",
+      "photoUrl": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80",
+      "period": "Masa Bakti: 2020 - 2028",
+      "contact": "samuel.wijaya@gkhk.or.id",
+      "description": "Bertanggung jawab penuh atas pelayanan kerohanian, penggembalaan, dan arah visi strategis pengajaran firman di CMS Jakarta.",
+      "order": 1
+    },
+    {
+      "id": "org_2",
+      "name": "Pnt. Budi Santoso",
+      "roleName": "Sekretaris Majelis & Penatua Jemaat",
+      "photoUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+      "period": "Masa Bakti: 2024 - 2029",
+      "contact": "budi.santoso@gkhk.or.id",
+      "description": "Mengoordinasikan administrasi umum, sekretariat gereja, tata kelola rapat majelis, dan pelayanan jemaat dewasa.",
+      "order": 2
+    },
+    {
+      "id": "org_3",
+      "name": "Dk. Elizabeth Tan",
+      "roleName": "Bendahara Majelis Jemaat",
+      "photoUrl": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80",
+      "period": "Masa Bakti: 2024 - 2029",
+      "contact": "elizabeth.tan@gkhk.or.id",
+      "description": "Mengelola keuangan operasional gereja, pelaporan anggaran tahunan, diakonia kasih, dan verifikasi keuangan komisi-komisi.",
+      "order": 3
+    }
+  ],
+  "ministries": [
+    {
+      "id": "min_1",
+      "name": "Komisi Musik & Praise Worship",
+      "leader": "Sdr. David Haryono",
+      "schedule": "Latihan: Setiap Hari Sabtu, pukul 16.00 WIB di Main Sanctuary",
+      "description": "Melayani musik, penyanyi latar (backing vocal), song leader, serta pemimpin pujian (Worship Leader) untuk Ibadah Raya 1, 2, dan 3.",
+      "contact": "0812-7777-6661",
+      "category": "Musik & Pujian"
+    },
+    {
+      "id": "min_2",
+      "name": "Pelayanan Guru Sekolah Minggu (SM)",
+      "leader": "Ibu Listiawati",
+      "schedule": "Rapat Kurikulum: Minggu pertama tiap bulan, pukul 13.00 WIB",
+      "description": "Mendidik anak-anak jemaat usia batita hingga kelas 6 SD dalam kebenaran firman Tuhan dengan metode interaktif, cerita Alkitab, dan kerajinan tangan.",
+      "contact": "0812-7777-6662",
+      "category": "Pendidikan Anak"
+    },
+    {
+      "id": "min_3",
+      "name": "Komisi MultiMedia, Live & Sound",
+      "leader": "Sdr. Yusuf Setiawan",
+      "schedule": "Persiapan Teknis: Hari Minggu mulai pukul 06.30 WIB",
+      "description": "Bertanggung jawab atas jalannya tata suara (sound system), kamera live streaming YouTube, pengoperasian slide proyektor, serta publikasi digital sosial media gereja.",
+      "contact": "0812-7777-6663",
+      "category": "Media & Teknologi"
+    }
+  ],
+  "congregations": [
+    {
+      "id": "cong_1",
+      "name": "Andi Wijaya",
+      "photoUrl": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
+      "address": "Jl. Taman Ratu Indah No. 5, Jakarta Barat",
+      "phone": "081234567803",
+      "email": "jemaat@church.com",
+      "isBaptized": true,
+      "isMarried": false,
+      "familyMembers": "Anak dari Bapak Setiawan & Ibu Martha",
+      "commission": "Pemuda",
+      "ministry": "Komisi Musik & Praise Worship",
+      "joinDate": "2020-01-05"
+    },
+    {
+      "id": "cong_2",
+      "name": "Christian Sugiono",
+      "photoUrl": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80",
+      "address": "Perumahan Puri Indah, Blok D-10, Jakarta Barat",
+      "phone": "085712345678",
+      "email": "christian.s@gmail.com",
+      "isBaptized": true,
+      "isMarried": true,
+      "familyMembers": "Kepala Keluarga (Istri: Titi Kamal, Anak: Juna, Kai)",
+      "commission": "Pria",
+      "ministry": "Majelis Jemaat",
+      "joinDate": "2017-06-22"
+    },
+    {
+      "id": "cong_3",
+      "name": "Clara Shinta",
+      "photoUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+      "address": "Apartemen Belmont Residence Unit 12A, Kebon Jeruk",
+      "phone": "081398765432",
+      "email": "clara.shinta@yahoo.com",
+      "isBaptized": true,
+      "isMarried": false,
+      "familyMembers": "Lajang",
+      "commission": "Wanita",
+      "ministry": "Paduan Suara / Choir",
+      "joinDate": "2021-11-03"
+    }
+  ],
+  "comments": [
+    {
+      "id": "cmt_1",
+      "targetId": "news_1",
+      "targetType": "news",
+      "targetTitle": "Sukses Terlaksana: KKR Pemuda-Remaja CMS 2026 Menarik Ratusan Peserta",
+      "userName": "Andi Wijaya",
+      "userEmail": "jemaat@church.com",
+      "userPhoto": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
+      "content": "Luar biasa sekali acaranya! Firman Tuhan yang disampaikan sangat membakar semangat kami para pemuda agar selalu setia melayani Tuhan di gereja lokal kita.",
+      "date": "2026-07-19T21:40:00",
+      "status": "approved",
+      "likes": 12
+    },
+    {
+      "id": "cmt_2",
+      "targetId": "news_1",
+      "targetType": "news",
+      "targetTitle": "Sukses Terlaksana: KKR Pemuda-Remaja CMS 2026 Menarik Ratusan Peserta",
+      "userName": "Hendra Saputra",
+      "userEmail": "hendra.saputra@gmail.com",
+      "content": "Praise the Lord! Panitia sungguh bekerja luar biasa mempersiapkan sound, live, dan drama musikalnya. Ditunggu retreat gabungan berikutnya!",
+      "date": "2026-07-20T08:15:00",
+      "status": "approved",
+      "likes": 8
+    },
+    {
+      "id": "cmt_3",
+      "targetId": "dev_1",
+      "targetType": "devotion",
+      "targetTitle": "Berjalan dalam Terang",
+      "userName": "Merry Angriani",
+      "userEmail": "merry.ang@gmail.com",
+      "content": "Renungan yang sangat menguatkan hati di hari Senin pagi yang sibuk ini. Terima kasih kepada tim penulis renungan gereja CMS, Tuhan Yesus memberkati!",
+      "date": "2026-07-20T06:10:00",
+      "status": "approved",
+      "likes": 15
+    },
+    {
+      "id": "cmt_4",
+      "targetId": "news_1",
+      "targetType": "news",
+      "targetTitle": "Sukses Terlaksana: KKR Pemuda-Remaja CMS 2026 Menarik Ratusan Peserta",
+      "userName": "Spam Bot 2026",
+      "userEmail": "spambot@malicious.com",
+      "content": "DAPATKAN DISKON SEPATU OLAHRAGA TERBAIK HANYA HARI INI DI LINK KAMI!!! CHEAP SHOES HERE!",
+      "date": "2026-07-20T12:00:00",
+      "status": "spam",
+      "likes": 0
+    }
+  ],
+  "notifications": [
+    {
+      "id": "notif_1",
+      "title": "Informasi Ibadah Paskah 2026",
+      "content": "Jadwal lengkap ibadah paskah CMS telah dipublikasikan di menu Pengumuman. Segera cek detail jam pelayanan.",
+      "targetGroup": "all",
+      "sentDate": "2026-07-15T08:00:00",
+      "sentBy": "admin@church.com"
+    },
+    {
+      "id": "notif_2",
+      "title": "Pendaftaran Seminar Keluarga Dibuka",
+      "content": "Khusus bagi Pasangan Jemaat, pendaftaran Seminar Hubungan Keluarga Bahagia telah dibuka di dashboard masing-masing.",
+      "targetGroup": "jemaat",
+      "sentDate": "2026-07-19T09:30:00",
+      "sentBy": "superadmin@church.com"
+    }
+  ],
+  "prayer_requests": [
+    {
+      "id": "pry_1",
+      "userId": "usr_jemaat",
+      "userName": "Andi Wijaya",
+      "phone": "081234567803",
+      "content": "Mohon dukungan doa bagi nenek saya, Ibu Maria Wijaya, yang saat ini sedang dirawat di RS Siloam karena penyakit stroke ringan agar lekas dipulihkan oleh kuasa Tuhan.",
+      "date": "2026-07-20T14:20:00",
+      "isPrivate": false,
+      "status": "prayed"
+    },
+    {
+      "id": "pry_2",
+      "userId": "usr_jemaat",
+      "userName": "Andi Wijaya",
+      "phone": "081234567803",
+      "content": "Mohon doa khusus pribadi untuk kelancaran tes wawancara kerja saya pada hari Rabu esok agar dimampukan oleh Tuhan.",
+      "date": "2026-07-20T15:00:00",
+      "isPrivate": true,
+      "status": "pending"
+    }
+  ]
+}
