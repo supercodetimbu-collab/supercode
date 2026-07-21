@@ -52,6 +52,7 @@ import {
   signInWithGoogleDrive,
   signOutGoogleDrive,
 } from '../lib/googleDriveSync';
+import firebaseConfig from '../../firebase-applet-config.json';
 
 interface AdminModulesProps {
   activeTab: string;
@@ -132,6 +133,7 @@ export default function AdminModules({
   });
   const [isSyncingGDrive, setIsSyncingGDrive] = useState(false);
   const [gdriveSyncLogs, setGdriveSyncLogs] = useState<string[]>([]);
+  const [domainError, setDomainError] = useState<string | null>(null);
 
   useEffect(() => {
     const unsubscribe = initGoogleDriveAuth(
@@ -553,14 +555,21 @@ export default function AdminModules({
       localStorage.setItem('church_sync_sheet_url', sheetUrl.trim());
       const res = await MockDatabase.syncFromGoogleSheet(sheetUrl.trim(), selectedTablesToSync);
       if (res.success) {
+        const hasErrors = res.logs && res.logs.some((log: string) => log.includes("Gagal") || log.includes("tidak ditemukan"));
         setSheetSyncLogs(prev => [
           ...prev, 
-          ...res.logs, 
-          "Sinkronisasi berhasil! Seluruh data lokal dan cloud tersinkronisasi sempurna."
+          ...(res.logs || []), 
+          hasErrors 
+            ? "⚠ Sinkronisasi selesai dengan beberapa peringatan/error. Silakan periksa log di atas." 
+            : "Sinkronisasi berhasil! Seluruh data lokal dan cloud tersinkronisasi sempurna."
         ]);
         loadAllData();
         onSettingsSaved(MockDatabase.getSettings());
-        alert("Google Sheet berhasil disinkronkan!");
+        if (hasErrors) {
+          alert("Sinkronisasi Google Sheet selesai dengan beberapa peringatan/error. Silakan periksa detail log.");
+        } else {
+          alert("Google Sheet berhasil disinkronkan!");
+        }
       } else {
         setSheetSyncLogs(prev => [...prev, ...res.logs, "SINKRONISASI GAGAL!"]);
         alert("Gagal melakukan sinkronisasi Google Sheet. Silakan periksa log.");
@@ -575,6 +584,7 @@ export default function AdminModules({
 
   const handleConnectGDrive = async () => {
     try {
+      setDomainError(null);
       const res = await signInWithGoogleDrive();
       if (res) {
         setGdriveUser(res.user);
@@ -600,7 +610,16 @@ export default function AdminModules({
       }
     } catch (err: any) {
       console.error(err);
-      setGdriveSyncLogs(prev => [...prev, `✖ Kesalahan: ${err.message || err}`]);
+      if (err.code === 'auth/unauthorized-domain' || err.message?.includes('unauthorized-domain')) {
+        setDomainError(window.location.hostname);
+        setGdriveSyncLogs(prev => [
+          ...prev, 
+          `✖ Gagal menghubungkan ke Google Drive: Domain '${window.location.hostname}' tidak diotorisasi di Firebase.`,
+          `Silakan tambahkan domain ini ke daftar Authorized Domains di Firebase Console.`
+        ]);
+      } else {
+        setGdriveSyncLogs(prev => [...prev, `✖ Kesalahan: ${err.message || err}`]);
+      }
     } finally {
       setIsSyncingGDrive(false);
     }
@@ -1582,6 +1601,54 @@ export default function AdminModules({
                     >
                       <Upload className="w-4 h-4" /> Hubungkan Google Drive Saya
                     </button>
+
+                    {domainError && (
+                      <div className="mt-4 p-4 text-left border border-amber-200 bg-amber-50/50 rounded-2xl text-xs text-amber-900 space-y-3">
+                        <div className="flex items-start gap-2 text-amber-800">
+                          <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-amber-600" />
+                          <div>
+                            <p className="font-bold uppercase tracking-wider text-[10px] text-amber-950">
+                              Error: Domain Belum Diotorisasi di Firebase
+                            </p>
+                            <p className="mt-1 leading-relaxed text-[11px] text-amber-800 font-sans">
+                              Agar sinkronisasi Google Drive dapat berjalan lancar di server container (Cloud Run), domain aplikasi ini harus ditambahkan ke daftar <strong>Authorized Domains</strong> di konsol Firebase proyek Anda.
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="p-3 bg-white rounded-xl border border-amber-100 space-y-2">
+                          <p className="font-bold text-[10px] text-amber-950 uppercase tracking-wider">
+                            Langkah Penyelesaian:
+                          </p>
+                          <ol className="list-decimal list-inside space-y-1 text-[11px] text-amber-800 font-sans">
+                            <li>Buka <a href="https://console.firebase.google.com/" target="_blank" rel="noreferrer" className="text-indigo-600 underline font-semibold hover:text-indigo-700">Firebase Console</a> Anda.</li>
+                            <li>Pilih proyek <strong>{firebaseConfig.projectId}</strong>.</li>
+                            <li>Buka menu <strong>Build</strong> &gt; <strong>Authentication</strong> &gt; tab <strong>Settings</strong> &gt; bagian <strong>Authorized domains</strong>.</li>
+                            <li>Klik tombol <strong>Add domain</strong>, lalu masukkan domain di bawah ini:</li>
+                          </ol>
+
+                          <div className="mt-2 p-2 bg-slate-900 text-slate-100 rounded-lg flex items-center justify-between gap-2 border border-slate-800">
+                            <code className="font-mono text-[11px] select-all text-amber-300 truncate flex-1 block pl-1">
+                              {domainError}
+                            </code>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                navigator.clipboard.writeText(domainError);
+                                alert("Domain berhasil disalin!");
+                              }}
+                              className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-[10px] font-bold rounded text-white transition-colors cursor-pointer shrink-0"
+                            >
+                              Salin
+                            </button>
+                          </div>
+                          
+                          <p className="text-[10px] text-amber-700 mt-1 font-sans">
+                            Setelah menambahkan domain di atas di Firebase Console, silakan muat ulang halaman ini dan klik tombol <strong>Hubungkan Google Drive Saya</strong> kembali.
+                          </p>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <div className="space-y-4">
