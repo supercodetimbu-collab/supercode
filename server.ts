@@ -282,77 +282,79 @@ app.post("/api/db/sync-sheet", async (req, res) => {
       "gallery",
     ];
 
-    for (const table of targetTables) {
-      // Fetch public CSV for the sheet tab matching the table name
-      const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=${table}`;
-      try {
-        const response = await fetch(csvUrl);
-        if (!response.ok) {
-          logs.push(`Tab "${table}" tidak ditemukan atau tidak dapat diakses.`);
-          continue;
-        }
+    await Promise.all(
+      targetTables.map(async (table) => {
+        // Fetch public CSV for the sheet tab matching the table name
+        const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=${table}`;
+        try {
+          const response = await fetch(csvUrl);
+          if (!response.ok) {
+            logs.push(`Tab "${table}" tidak ditemukan atau tidak dapat diakses.`);
+            return;
+          }
 
-        const csvText = await response.text();
-        // Check if returned text looks like HTML (meaning sheet is private or login is requested)
-        if (csvText.trim().startsWith("<!DOCTYPE html") || csvText.includes("Sign in")) {
-          throw new Error("Google Sheet harus dibagikan sebagai 'Siapa saja yang memiliki link dapat melihat' (Anyone with the link can view)");
-        }
+          const csvText = await response.text();
+          // Check if returned text looks like HTML (meaning sheet is private or login is requested)
+          if (csvText.trim().startsWith("<!DOCTYPE html") || csvText.includes("Sign in")) {
+            throw new Error("Google Sheet harus dibagikan sebagai 'Siapa saja yang memiliki link dapat melihat' (Anyone with the link can view)");
+          }
 
-        const parsedRows = parseCSV(csvText);
-        if (parsedRows.length <= 1) {
-          logs.push(`Tab "${table}" kosong atau hanya memiliki header.`);
-          continue;
-        }
+          const parsedRows = parseCSV(csvText);
+          if (parsedRows.length <= 1) {
+            logs.push(`Tab "${table}" kosong atau hanya memiliki header.`);
+            return;
+          }
 
-        const headers = parsedRows[0].map(h => h.replace(/^"|"$/g, "").trim());
-        const dataRows = parsedRows.slice(1);
+          const headers = parsedRows[0].map(h => h.replace(/^"|"$/g, "").trim());
+          const dataRows = parsedRows.slice(1);
 
-        const records = dataRows.map((row, rowIndex) => {
-          const record: Record<string, any> = {};
-          headers.forEach((header, colIndex) => {
-            if (!header) return;
-            let value: any = row[colIndex] !== undefined ? row[colIndex].replace(/^"|"$/g, "").trim() : "";
-            
-            // Try to parse JSON or boolean or numbers
-            if (value.toLowerCase() === "true") {
-              value = true;
-            } else if (value.toLowerCase() === "false") {
-              value = false;
-            } else if (!isNaN(Number(value)) && value !== "") {
-              value = Number(value);
-            } else if ((value.startsWith("{") && value.endsWith("}")) || (value.startsWith("[") && value.endsWith("]"))) {
-              try {
-                value = JSON.parse(value);
-              } catch (e) {
-                // Keep as string if parsing fails
+          const records = dataRows.map((row, rowIndex) => {
+            const record: Record<string, any> = {};
+            headers.forEach((header, colIndex) => {
+              if (!header) return;
+              let value: any = row[colIndex] !== undefined ? row[colIndex].replace(/^"|"$/g, "").trim() : "";
+              
+              // Try to parse JSON or boolean or numbers
+              if (value.toLowerCase() === "true") {
+                value = true;
+              } else if (value.toLowerCase() === "false") {
+                value = false;
+              } else if (!isNaN(Number(value)) && value !== "") {
+                value = Number(value);
+              } else if ((value.startsWith("{") && value.endsWith("}")) || (value.startsWith("[") && value.endsWith("]"))) {
+                try {
+                  value = JSON.parse(value);
+                } catch (e) {
+                  // Keep as string if parsing fails
+                }
               }
+              record[header] = value;
+            });
+            
+            // Ensure it has an ID if missing
+            if (!record.id) {
+              record.id = `${table.slice(0, 3)}_${Date.now()}_${rowIndex}`;
             }
-            record[header] = value;
+            return record;
           });
-          
-          // Ensure it has an ID if missing
-          if (!record.id) {
-            record.id = `${table.slice(0, 3)}_${Date.now()}_${rowIndex}`;
-          }
-          return record;
-        });
 
-        if (table === "settings") {
-          // Settings is a single object, not an array
-          if (records.length > 0) {
-            currentDb.settings = { ...currentDb.settings, ...records[0] };
-            syncResults[table] = currentDb.settings;
-            logs.push(`Berhasil sinkronisasi ${table} (1 konfigurasi).`);
+          if (table === "settings") {
+            // Settings is a single object, not an array
+            if (records.length > 0) {
+              currentDb.settings = { ...currentDb.settings, ...records[0] };
+              syncResults[table] = currentDb.settings;
+              logs.push(`Berhasil sinkronisasi ${table} (1 konfigurasi).`);
+            }
+          } else {
+            currentDb[table] = records;
+            syncResults[table] = records;
+            logs.push(`Berhasil sinkronisasi ${table} (${records.length} baris).`);
           }
-        } else {
-          currentDb[table] = records;
-          syncResults[table] = records;
-          logs.push(`Berhasil sinkronisasi ${table} (${records.length} baris).`);
+        } catch (error: any) {
+          logs.push(`Gagal memproses tab "${table}": ${error.message}`);
         }
-      } catch (error: any) {
-        logs.push(`Gagal memproses tab "${table}": ${error.message}`);
-      }
-    }
+      })
+    );
 
     // Save synchronized database to file
     await saveDatabase(currentDb);

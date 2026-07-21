@@ -605,6 +605,22 @@ export class MockDatabase {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sheetUrl, tables }),
       });
+      
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        const text = await response.text();
+        console.error("Non-JSON response received:", text);
+        return {
+          success: false,
+          logs: [
+            "Server mengembalikan respon non-JSON (HTML/Teks).",
+            `Status: ${response.status} ${response.statusText}`,
+            "Kemungkinan server sedang memuat ulang konfigurasi atau koneksi terputus.",
+            "Silakan tunggu sekitar 10-20 detik lalu coba klik Sinkronkan lagi."
+          ]
+        };
+      }
+
       const result = await response.json();
       if (result.success) {
         // Load the new synced database into localStorage
