@@ -18,9 +18,10 @@ if (fs.existsSync(CONFIG_PATH)) {
   try {
     const config = JSON.parse(fs.readFileSync(CONFIG_PATH, "utf-8"));
     firebaseApp = initializeApp(config);
-    // Use custom databaseId from config if provided
-    firestoreDb = getFirestore(firebaseApp, config.firestoreDatabaseId || "(default)");
-    console.log("Firebase initialized successfully on Express server with DB ID:", config.firestoreDatabaseId || "(default)");
+    // Use custom databaseId from config if provided, fallback to the allocated applet database ID
+    const dbId = config.firestoreDatabaseId || "ai-studio-supercoding-90a28953-19d3-40a0-908e-f7b84ded0118";
+    firestoreDb = getFirestore(firebaseApp, dbId);
+    console.log("Firebase initialized successfully on Express server with DB ID:", dbId);
   } catch (e) {
     console.error("Failed to initialize Firebase on Express server:", e);
   }
@@ -287,7 +288,12 @@ app.post("/api/db/sync-sheet", async (req, res) => {
         // Fetch public CSV for the sheet tab matching the table name
         const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=${table}`;
         try {
-          const response = await fetch(csvUrl);
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+          
+          const response = await fetch(csvUrl, { signal: controller.signal });
+          clearTimeout(timeoutId);
+
           if (!response.ok) {
             logs.push(`Tab "${table}" tidak ditemukan atau tidak dapat diakses.`);
             return;
