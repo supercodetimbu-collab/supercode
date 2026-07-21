@@ -6,7 +6,13 @@ import './index.css';
 // Register PWA Service Worker to support offline caching and automatic Android/iOS installation prompts
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
+    // Dynamically calculate the base directory path (e.g. '/' or '/repository-name/')
+    const baseDir = window.location.pathname.endsWith('/')
+      ? window.location.pathname
+      : window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+    const swUrl = `${baseDir}sw.js`.replace(/\/+/g, '/');
+
+    navigator.serviceWorker.register(swUrl)
       .then((registration) => {
         console.log('[PWA] Service Worker registered successfully with scope:', registration.scope);
       })

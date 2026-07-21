@@ -201,6 +201,52 @@ export default function DashboardJemaat({
   const [eventRegPhone, setEventRegPhone] = useState(currentUser.phone || '');
   const [registeredSuccess, setRegisteredSuccess] = useState<EventRegistration | null>(null);
 
+  // Cool Youth Fellowship RSVP state and helper
+  const [coolYouthRsvped, setCoolYouthRsvped] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('cool_youth_rsvp_status') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const handleCoolYouthRsvp = () => {
+    if (coolYouthRsvped) {
+      setCoolYouthRsvped(false);
+      try {
+        localStorage.setItem('cool_youth_rsvp_status', 'false');
+      } catch (e) {
+        console.error(e);
+      }
+      showToast('RSVP COOL YOUTH FELLOWSHIP berhasil dibatalkan.', 'info');
+      return;
+    }
+
+    const regId = `reg_coolyouth_${Date.now()}`;
+    const newReg: EventRegistration = {
+      id: regId,
+      eventId: 'cool_youth_fellowship_id',
+      eventTitle: 'COOL YOUTH FELLOWSHIP',
+      userId: currentUser.id,
+      userName: currentUser.name,
+      userEmail: currentUser.email,
+      phone: currentUser.phone || '08123456789',
+      registerDate: new Date().toISOString(),
+      status: 'approved',
+      qrCodeUrl: `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=CMS-REG-${regId}-${currentUser.name.replace(/\s+/g, '')}`,
+      attended: false,
+    };
+
+    setCoolYouthRsvped(true);
+    try {
+      localStorage.setItem('cool_youth_rsvp_status', 'true');
+    } catch (e) {
+      console.error(e);
+    }
+    setRegisteredSuccess(newReg);
+    showToast('Sukses melakukan RSVP untuk COOL YOUTH FELLOWSHIP!', 'success');
+  };
+
   // Dynamic calculations
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
@@ -621,19 +667,21 @@ export default function DashboardJemaat({
                   </div>
                   <div className="flex justify-between text-xs">
                     <span className="font-extrabold uppercase text-slate-800">Kuota RSVP</span>
-                    <span className="font-mono font-bold">25 / 40 Terisi</span>
+                    <span className="font-mono font-bold">{coolYouthRsvped ? 26 : 25} / 40 Terisi</span>
                   </div>
                 </div>
               </div>
 
               <button
-                onClick={() => {
-                  showToast('Sukses melakukan RSVP untuk COOL YOUTH FELLOWSHIP!', 'success');
-                }}
-                className="mt-6 bg-[#1E293B] hover:bg-[#0F172A] text-white font-extrabold text-xs uppercase tracking-widest py-3 rounded-2xl transition-all flex items-center justify-center gap-2 shadow-lg w-full cursor-pointer"
+                onClick={handleCoolYouthRsvp}
+                className={`mt-6 font-extrabold text-xs uppercase tracking-widest py-3 rounded-2xl transition-all flex items-center justify-center gap-2 shadow-lg w-full cursor-pointer ${
+                  coolYouthRsvped
+                    ? 'bg-emerald-600 hover:bg-emerald-750 text-white'
+                    : 'bg-[#1E293B] hover:bg-[#0F172A] text-white'
+                }`}
               >
-                <span>Daftar RSVP</span>
-                <ChevronRight className="w-4 h-4" />
+                <span>{coolYouthRsvped ? 'Sudah RSVP (Batal)' : 'Daftar RSVP'}</span>
+                {coolYouthRsvped ? <Check className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
               </button>
             </div>
           </div>
