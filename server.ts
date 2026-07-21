@@ -192,8 +192,11 @@ async function saveDatabase(data: any): Promise<void> {
 }
 
 // API Routes
-// Get current server-side database
+// Get current server-side database (no-cache)
 app.get("/api/db", async (req, res) => {
+  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
   try {
     const dbData = await getDatabase();
     res.json({ success: true, data: dbData });

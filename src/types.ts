@@ -214,4 +214,5 @@ export interface ChurchSettings {
   qrisUrl?: string;
   adminWelcomeText?: string;
   adminSubText?: string;
+  googleSheetUrl?: string;
 }

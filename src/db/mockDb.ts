@@ -52,6 +52,7 @@ const DEFAULT_SETTINGS: ChurchSettings = {
   qrisUrl: 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=GBI_ROCK_JUANDA_OFFERING',
   adminWelcomeText: 'Selamat Datang, Pnt. Budi Santoso!',
   adminSubText: 'Sistem Informasi Manajemen dan Pelayanan CMS. Kelola berita, kustomisasi donasi, moderation komentar, and kelola jajaran organisasi secara instan.',
+  googleSheetUrl: '',
 };
 
 // Default Users for testing Role-Based Access Control
@@ -532,7 +533,7 @@ export class MockDatabase {
 
   static async loadFromServer() {
     try {
-      const res = await fetch("/api/db");
+      const res = await fetch(`/api/db?t=${Date.now()}`);
       const json = await res.json();
       if (json.success) {
         if (json.data) {
