@@ -10,22 +10,6 @@
       ) {
         window.location.replace(window.location.origin + window.location.pathname + '/' + window.location.search + window.location.hash);
       }
-
-      // 2. Proactively clear any stale service workers or Cache API caches to prevent blank screens
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(function(registrations) {
-          for (var i = 0; i < registrations.length; i++) {
-            registrations[i].unregister();
-          }
-        });
-        if (window.caches) {
-          caches.keys().then(function(names) {
-            for (var i = 0; i < names.length; i++) {
-              caches.delete(names[i]);
-            }
-          });
-        }
-      }
     </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
